@@ -18,6 +18,7 @@
             boost
             catch2
             cmake
+            glib
           ];
         };
       };
