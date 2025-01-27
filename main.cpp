@@ -15,7 +15,10 @@
 
 int main() {
 
+  int opt = 1;
+
   int server_socket = socket(AF_INET, SOCK_STREAM, 0);
+  setsockopt(server_socket, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(int));
 
   sockaddr_in server_address;
   server_address.sin_family = AF_INET;
@@ -29,14 +32,17 @@ int main() {
   if (listen(server_socket, 5) == -1)
     handle_error("listen");
 
-  int client_socket = accept(server_socket, nullptr, nullptr);
-  char buffer[1024] = {0};
+  while (true) {
+    int client_socket = accept(server_socket, nullptr, nullptr);
+    char buffer[1024] = {0};
 
-  recv(client_socket, buffer, sizeof(buffer), 0);
+    recv(client_socket, buffer, sizeof(buffer), 0);
 
-  std::cout << "Message from client: " << buffer << std::endl;
+    std::cout << "Message from client: " << buffer << std::endl;
+    if (write(client_socket, buffer, sizeof(buffer)) == -1)
+      handle_error("write");
+  }
 
   close(server_socket);
-
   return 0;
 }
