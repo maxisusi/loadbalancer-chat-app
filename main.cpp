@@ -15,15 +15,12 @@
     exit(EXIT_FAILURE);                                                        \
   } while (0)
 
-// #define PORT 9500
-#define PROCESS_NUM 3
-
 int main() {
 
-  int process_port[] = {7878, 6969, 2929};
-  int pids[PROCESS_NUM];
+  int process_port[] = {7878, 6969, 2929, 3030};
+  int process_port_len = sizeof(process_port) / sizeof(int);
 
-  for (int i = 0; i < PROCESS_NUM; ++i) {
+  for (int i = 0; i < process_port_len; ++i) {
     pid_t pid = fork();
 
     if (pid == -1)
@@ -39,10 +36,7 @@ int main() {
           .sin_family = AF_INET,
           .sin_port = htons(process_port[i]),
       };
-
       server_address.sin_addr.s_addr = INADDR_ANY;
-
-      std::cout << "Process ID: " << getpid() << std::endl;
 
       if (bind(server_socket, (struct sockaddr *)&server_address,
                sizeof(server_address)) == -1)
@@ -59,10 +53,14 @@ int main() {
         char buffer[1024] = {0};
 
         recv(client_socket, buffer, sizeof(buffer), 0);
-        std::cout << "Message from client: " << buffer << std::endl;
 
-        char response[] = "PONG";
-        if (write(client_socket, response, sizeof(response)) == -1)
+        printf("Message from client: %s", buffer);
+
+        // Send the process id back to the client
+        char f_pid[16];
+        snprintf(f_pid, sizeof(f_pid), "PONG - %d", getpid());
+
+        if (write(client_socket, f_pid, strlen(f_pid)) == -1)
           handle_error("write");
 
         close(client_socket);
@@ -72,7 +70,7 @@ int main() {
     }
   }
 
-  for (int i = 0; i < PROCESS_NUM; ++i) {
+  for (int i = 0; i < process_port_len; ++i) {
     wait(NULL);
   }
 
