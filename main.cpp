@@ -46,8 +46,11 @@ int main() {
     recv(client_socket, buffer, sizeof(buffer), 0);
     std::cout << "Message from client: " << buffer << std::endl;
 
-    if (write(client_socket, buffer, sizeof(buffer)) == -1)
+    char response[] = "PONG";
+    if (write(client_socket, response, sizeof(response)) == -1)
       handle_error("write");
+
+    close(client_socket);
   }
 
   close(server_socket);
