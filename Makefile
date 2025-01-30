@@ -7,8 +7,8 @@ VERSION=-std=c++17
 BUILD = ${CXX} -o ${BUILD_PATH} ${FILE_NAME} 
 
 all: 
-	${BUILD}
-	${BIN_PATH}
+	@${BUILD}
+	@${BIN_PATH}
 	
 build: ${BUILD_PATH}
 	${BUILD}	
