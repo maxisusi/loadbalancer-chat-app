@@ -4,7 +4,7 @@ BIN_PATH=./build/main
 
 CXX=clang++
 VERSION=-std=c++17
-BUILD = ${CXX} -o ${BUILD_PATH} ${FILE_NAME} 
+BUILD = ${CXX} -o ${BUILD_PATH} ${FILE_NAME} -lsqlite3 
 
 all: 
 	@${BUILD}

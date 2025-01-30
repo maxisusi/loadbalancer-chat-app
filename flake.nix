@@ -19,6 +19,8 @@
             catch2
             cmake
             glib
+            sqlite
+            pkg-config
           ];
         };
       };
