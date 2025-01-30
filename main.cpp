@@ -1,3 +1,4 @@
+#include <cstddef>
 #include <cstdio>
 #include <cstring>
 #include <ctime>
@@ -148,10 +149,63 @@ int main() {
   log.log(LogLevel::INFO, "Opening up sqlite connection...");
 
   sqlite3 *db;
-  if (sqlite3_open(DB_NAME, &db) < 0) {
+  sqlite3_open(DB_NAME, &db);
+
+  if (db == NULL) {
     log.log(LogLevel::CRITICAL, "Process couln't open sqlite file descriptor");
     handle_error("sqlite3_open");
   }
+
+  const char *create_stmt =
+      "CREATE TABLE Persons ( PersonID int, LastName varchar(255), FirstName "
+      "varchar(255), Address varchar(255), City varchar(255));";
+
+  sqlite3_stmt *fn_create_stmt;
+  sqlite3_prepare_v2(db, create_stmt, -1, &fn_create_stmt, nullptr);
+
+  if (fn_create_stmt == NULL) {
+    log.log(LogLevel::CRITICAL,
+            "Process couln't compile SQL statement (create)");
+    handle_error("sqlite3_prepare_v2");
+  }
+  auto result = sqlite3_step(fn_create_stmt);
+  if (result == (SQLITE_MISUSE | SQLITE_ERROR)) {
+    log.log(LogLevel::CRITICAL, "Process couln't step SQL statement (create)");
+    handle_error("sqlite3_prepare_v2");
+  }
+
+  if (result == SQLITE_DONE) {
+    log.log(LogLevel::INFO, "SQL sucessfully processed");
+  }
+
+  sqlite3_reset(fn_create_stmt);
+
+  // const char *insert_stmt = "INSERT INTO Persons ('1', 'Balej', 'Max', 'Rue
+  // de "
+  //                           "Gottefrey 38', 'Saxon')";
+  //
+  // sqlite3_stmt *fn_insert_stmt;
+  // sqlite3_prepare_v2(db, insert_stmt, -1, &fn_insert_stmt, nullptr);
+  //
+  // if (fn_insert_stmt == NULL) {
+  //   log.log(LogLevel::CRITICAL,
+  //           "Process couln't compile SQL statement (insert)");
+  //   handle_error("sqlite3_prepare_v2");
+  // }
+  //
+  // auto result_insert = sqlite3_step(fn_insert_stmt);
+  // if (result_insert == SQLITE_MISUSE) {
+  //   log.log(LogLevel::CRITICAL, "Process couln't step SQL statement
+  //   (insert)"); handle_error("sqlite3_prepare_v2");
+  // }
+  //
+  // if (result_insert == SQLITE_DONE) {
+  //   log.log(LogLevel::INFO, "SQL sucessfully processed");
+  // }
+  //
+  // sqlite3_reset(fn_insert_stmt);
+
+  sqlite3_close(db);
 
   // log.log(LogLevel::INFO, "Instantiate servers");
 
