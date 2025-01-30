@@ -4,6 +4,7 @@
 #include <iostream>
 #include <netinet/in.h>
 #include <sched.h>
+#include <sqlite3.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
@@ -12,6 +13,7 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
+#define DB_NAME "db_test.db"
 #define handle_error(msg)                                                      \
   do {                                                                         \
     perror(msg);                                                               \
@@ -143,26 +145,33 @@ int main() {
   int process_port_len = sizeof(process_port) / sizeof(int);
 
   Logger log = *new Logger();
+  log.log(LogLevel::INFO, "Opening up sqlite connection...");
 
-  log.log(LogLevel::INFO, "Instantiate servers");
-
-  for (int i = 0; i < process_port_len; ++i) {
-    pid_t pid = fork();
-
-    if (pid == -1) {
-      log.log(LogLevel::CRITICAL, "Couldn't instantiate another process");
-      handle_error("fork");
-    }
-
-    if (pid == 0) {
-      Node *server = new Node(process_port[i]);
-      server->run();
-    }
+  sqlite3 *db;
+  if (sqlite3_open(DB_NAME, &db) < 0) {
+    log.log(LogLevel::CRITICAL, "Process couln't open sqlite file descriptor");
+    handle_error("sqlite3_open");
   }
 
-  for (int i = 0; i < process_port_len; ++i) {
-    wait(NULL);
-  }
+  // log.log(LogLevel::INFO, "Instantiate servers");
+
+  // for (int i = 0; i < process_port_len; ++i) {
+  //   pid_t pid = fork();
+  //
+  //   if (pid == -1) {
+  //     log.log(LogLevel::CRITICAL, "Couldn't instantiate another
+  //     process"); handle_error("fork");
+  //   }
+  //
+  //   if (pid == 0) {
+  //     Node *server = new Node(process_port[i]);
+  //     server->run();
+  //   }
+  // }
+  //
+  // for (int i = 0; i < process_port_len; ++i) {
+  //   wait(NULL);
+  // }
 
   return 0;
 }
