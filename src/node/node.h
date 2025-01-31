@@ -1,3 +1,5 @@
+#ifndef NODE_H
+#define NODE_H
 #include <netinet/in.h>
 
 enum NodeStatus { STOP, RUNNING, RESTARTING };
@@ -21,3 +23,4 @@ private:
 public:
   void run();
 };
+#endif

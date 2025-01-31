@@ -1,5 +1,4 @@
 #include "logger/logger.h"
-#include "node/node.h"
 #include "sql_driver/sqldriver.h"
 #include <cstdio>
 #include <cstring>
