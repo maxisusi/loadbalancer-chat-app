@@ -140,124 +140,102 @@ public:
   }
 };
 
-int main() {
+class SqlDriver {
 
-  int process_port[] = {7878, 6969, 2929, 3030};
-  int process_port_len = sizeof(process_port) / sizeof(int);
+  std::string db_name;
+  sqlite3 *db_instance;
+
+public:
+  SqlDriver(std::string db_n) { db_name = db_n; };
+
+public:
+  int init() {
+    sqlite3_open(DB_NAME, &db_instance);
+
+    if (db_instance == NULL) {
+      {
+        // log.log(LogLevel::CRITICAL,
+        //         "Process couln't open sqlite file descriptor");
+        return -1;
+        // TODO: Refacto error message with either enum or macros
+      }
+    }
+    return 0;
+  }
+
+public:
+  sqlite3_stmt *stage(const char *statement) {
+
+    sqlite3_stmt *stmt;
+
+    int prep = sqlite3_prepare_v2(db_instance, statement, -1, &stmt, nullptr);
+    if (stmt == NULL) {
+      return nullptr;
+      // TODO: write to std error the message
+      // log.log(LogLevel::CRITICAL, "Process couln't compile SQL statement");
+      // handle_error("sqlite3_prepare_v2");
+    }
+
+    return stmt;
+  }
+
+public:
+  int run_query(sqlite3_stmt *statement) {
+
+    Logger log = *new Logger();
+    while (sqlite3_step(statement) != SQLITE_DONE) {
+      int nums_col = sqlite3_column_count(statement);
+
+      for (int i = 0; i < nums_col; ++i) {
+        switch (sqlite3_column_type(statement, i)) {
+        case SQLITE_TEXT: {
+          std::string column_text = std::string(reinterpret_cast<const char *>(
+              sqlite3_column_text(statement, i)));
+          log.log(LogLevel::INFO, column_text);
+          break;
+        }
+        case SQLITE_INTEGER: {
+          auto column = std::to_string(sqlite3_column_int(statement, i));
+          log.log(LogLevel::INFO, column);
+          break;
+        }
+
+        case SQLITE_FLOAT: {
+          auto column = sqlite3_column_double(statement, i);
+          log.log(LogLevel::INFO, std::to_string(column));
+          break;
+        }
+        default: {
+          // TODO: Better error management
+          return -1;
+          log.log(LogLevel::WARNING, "Couldn't find correspondig time table");
+        }
+        }
+      }
+    }
+
+    sqlite3_finalize(statement);
+
+    return 1;
+  }
+
+public:
+  void close() {
+    sqlite3_close(db_instance); // TODO: Handle error }
+  }
+};
+
+int main() {
 
   Logger log = *new Logger();
   log.log(LogLevel::INFO, "Opening up sqlite connection...");
 
-  sqlite3 *db;
-  sqlite3_open(DB_NAME, &db);
+  SqlDriver sql_instance = *new SqlDriver(DB_NAME);
 
-  if (db == NULL) {
-    log.log(LogLevel::CRITICAL, "Process couln't open sqlite file descriptor");
-    handle_error("sqlite3_open");
-  }
-
-  const char *create = "CREATE TABLE Persons (PersonID INT);";
-  const char *insert = "INSERT INTO Persons (PersonID) VALUES (1);";
-  const char *get_all = "SELECT * FROM Persons;";
-
-  sqlite3_stmt *stmt;
-  int prep = sqlite3_prepare_v2(db, get_all, -1, &stmt, nullptr);
-
-  if (stmt == NULL) {
-    log.log(LogLevel::CRITICAL, "Process couln't compile SQL statement");
-    handle_error("sqlite3_prepare_v2");
-  }
-
-  while (sqlite3_step(stmt) != SQLITE_DONE) {
-    int nums_col = sqlite3_column_count(stmt);
-
-    for (int i = 0; i < nums_col; ++i) {
-
-      switch (sqlite3_column_type(stmt, i)) {
-      case SQLITE_TEXT: {
-        std::string column_text = std::string(
-            reinterpret_cast<const char *>(sqlite3_column_text(stmt, i)));
-        log.log(LogLevel::INFO, column_text);
-        break;
-      }
-      case SQLITE_INTEGER: {
-        auto column = std::to_string(sqlite3_column_int(stmt, i));
-        log.log(LogLevel::INFO, column);
-        break;
-      }
-
-      case SQLITE_FLOAT: {
-        auto column = sqlite3_column_double(stmt, i);
-        log.log(LogLevel::INFO, std::to_string(column));
-        break;
-      }
-      default: {
-        log.log(LogLevel::WARNING, "Couldn't find correspondig time table");
-      }
-      }
-    }
-  }
-
-  sqlite3_finalize(stmt);
-
-  log.log(LogLevel::INFO, "Success executing SQLite query");
-  sqlite3_close(db);
-
-  // if (result == (SQLITE_MISUSE | SQLITE_ERROR)) {
-  //   log.log(LogLevel::CRITICAL, "Process couln't step SQL statement
-  //   (create)"); handle_error("sqlite3_prepare_v2");
-  // }
-  //
-  // if (result == SQLITE_DONE) {
-  //   log.log(LogLevel::INFO, "SQL sucessfully processed");
-  // }
-  //
-  // sqlite3_reset(fn_create_stmt);
-
-  // const char *insert_stmt = "INSERT INTO Persons ('1', 'Balej', 'Max', 'Rue
-  // de "
-  //                           "Gottefrey 38', 'Saxon')";
-  //
-  // sqlite3_stmt *fn_insert_stmt;
-  // sqlite3_prepare_v2(db, insert_stmt, -1, &fn_insert_stmt, nullptr);
-  //
-  // if (fn_insert_stmt == NULL) {
-  //   log.log(LogLevel::CRITICAL,
-  //           "Process couln't compile SQL statement (insert)");
-  //   handle_error("sqlite3_prepare_v2");
-  // }
-  //
-  // auto result_insert = sqlite3_step(fn_insert_stmt);
-  // if (result_insert == SQLITE_MISUSE) {
-  //   log.log(LogLevel::CRITICAL, "Process couln't step SQL statement
-  //   (insert)"); handle_error("sqlite3_prepare_v2");
-  // }
-  //
-  // if (result_insert == SQLITE_DONE) {
-  //   log.log(LogLevel::INFO, "SQL sucessfully processed");
-  // }
-  //
-  // sqlite3_reset(fn_insert_stmt);
-
-  // log.log(LogLevel::INFO, "Instantiate servers");
-
-  // for (int i = 0; i < process_port_len; ++i) {
-  //   pid_t pid = fork();
-  //
-  //   if (pid == -1) {
-  //     log.log(LogLevel::CRITICAL, "Couldn't instantiate another
-  //     process"); handle_error("fork");
-  //   }
-  //
-  //   if (pid == 0) {
-  //     Node *server = new Node(process_port[i]);
-  //     server->run();
-  //   }
-  // }
-  //
-  // for (int i = 0; i < process_port_len; ++i) {
-  //   wait(NULL);
-  // }
+  sql_instance.init();
+  auto stmt = sql_instance.stage("SELECT * FROM Persons;");
+  sql_instance.run_query(stmt);
+  sql_instance.close();
 
   return 0;
 }
