@@ -156,29 +156,63 @@ int main() {
     handle_error("sqlite3_open");
   }
 
-  const char *create_stmt =
-      "CREATE TABLE Persons ( PersonID int, LastName varchar(255), FirstName "
-      "varchar(255), Address varchar(255), City varchar(255));";
+  const char *create = "CREATE TABLE Persons (PersonID INT);";
+  const char *insert = "INSERT INTO Persons (PersonID) VALUES (1);";
+  const char *get_all = "SELECT * FROM Persons;";
 
-  sqlite3_stmt *fn_create_stmt;
-  sqlite3_prepare_v2(db, create_stmt, -1, &fn_create_stmt, nullptr);
+  sqlite3_stmt *stmt;
+  int prep = sqlite3_prepare_v2(db, get_all, -1, &stmt, nullptr);
 
-  if (fn_create_stmt == NULL) {
-    log.log(LogLevel::CRITICAL,
-            "Process couln't compile SQL statement (create)");
-    handle_error("sqlite3_prepare_v2");
-  }
-  auto result = sqlite3_step(fn_create_stmt);
-  if (result == (SQLITE_MISUSE | SQLITE_ERROR)) {
-    log.log(LogLevel::CRITICAL, "Process couln't step SQL statement (create)");
+  if (stmt == NULL) {
+    log.log(LogLevel::CRITICAL, "Process couln't compile SQL statement");
     handle_error("sqlite3_prepare_v2");
   }
 
-  if (result == SQLITE_DONE) {
-    log.log(LogLevel::INFO, "SQL sucessfully processed");
+  while (sqlite3_step(stmt) != SQLITE_DONE) {
+    int nums_col = sqlite3_column_count(stmt);
+
+    for (int i = 0; i < nums_col; ++i) {
+
+      switch (sqlite3_column_type(stmt, i)) {
+      case SQLITE_TEXT: {
+        std::string column_text = std::string(
+            reinterpret_cast<const char *>(sqlite3_column_text(stmt, i)));
+        log.log(LogLevel::INFO, column_text);
+        break;
+      }
+      case SQLITE_INTEGER: {
+        auto column = std::to_string(sqlite3_column_int(stmt, i));
+        log.log(LogLevel::INFO, column);
+        break;
+      }
+
+      case SQLITE_FLOAT: {
+        auto column = sqlite3_column_double(stmt, i);
+        log.log(LogLevel::INFO, std::to_string(column));
+        break;
+      }
+      default: {
+        log.log(LogLevel::WARNING, "Couldn't find correspondig time table");
+      }
+      }
+    }
   }
 
-  sqlite3_reset(fn_create_stmt);
+  sqlite3_finalize(stmt);
+
+  log.log(LogLevel::INFO, "Success executing SQLite query");
+  sqlite3_close(db);
+
+  // if (result == (SQLITE_MISUSE | SQLITE_ERROR)) {
+  //   log.log(LogLevel::CRITICAL, "Process couln't step SQL statement
+  //   (create)"); handle_error("sqlite3_prepare_v2");
+  // }
+  //
+  // if (result == SQLITE_DONE) {
+  //   log.log(LogLevel::INFO, "SQL sucessfully processed");
+  // }
+  //
+  // sqlite3_reset(fn_create_stmt);
 
   // const char *insert_stmt = "INSERT INTO Persons ('1', 'Balej', 'Max', 'Rue
   // de "
@@ -204,8 +238,6 @@ int main() {
   // }
   //
   // sqlite3_reset(fn_insert_stmt);
-
-  sqlite3_close(db);
 
   // log.log(LogLevel::INFO, "Instantiate servers");
 
