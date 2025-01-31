@@ -4,13 +4,22 @@
 #include <sqlite3.h>
 #include <string>
 
+using namespace std;
+
+/**
+ * Define Result Code
+ *
+ * Future Error code may be added
+ **/
+#define SQLDRIVER_ERROR 0 /* Generic Error */
+
 class SqlDriver {
 
   std::string db_name;
   sqlite3 *db_instance;
 
 public:
-  SqlDriver(std::string db_n);
+  SqlDriver(string db_n);
 
 public:
   int init();

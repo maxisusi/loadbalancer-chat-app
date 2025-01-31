@@ -7,6 +7,7 @@
 SqlDriver::SqlDriver(std::string db_n) { db_name = db_n; };
 
 int SqlDriver::init() {
+
   char buffer[50];
   strcpy(buffer, db_name.c_str());
   sqlite3_open(buffer, &db_instance);
@@ -28,10 +29,6 @@ sqlite3_stmt *SqlDriver::stage(const char *statement) {
   int prep = sqlite3_prepare_v2(db_instance, statement, -1, &stmt, nullptr);
   if (stmt == NULL) {
     return nullptr;
-    // TODO: write to std error the message
-    // log.log(LogLevel::CRITICAL, "Process couln't compile SQL
-    // statement ");
-    // handle_error("sqlite3_prepare_v2");
   }
 
   return stmt;
@@ -69,7 +66,6 @@ int SqlDriver::run_query(sqlite3_stmt *statement) {
       }
     }
   }
-
   sqlite3_finalize(statement);
   return 1;
 }

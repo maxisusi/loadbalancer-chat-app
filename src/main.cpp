@@ -29,8 +29,17 @@ int main() {
   SqlDriver sql_instance = *new SqlDriver(DB_NAME);
 
   sql_instance.init();
-  auto stmt = sql_instance.stage("SELECT * FROM Persons;");
-  sql_instance.run_query(stmt);
+
+  auto create_stmt = sql_instance.stage(
+      "CREATE TABLE IF NOT EXISTS Person (name varchar(255))");
+  sql_instance.run_query(create_stmt);
+  auto insert_stmt =
+      sql_instance.stage("INSERT INTO Person (name) VALUES ('MDRR')");
+  sql_instance.run_query(insert_stmt);
+
+  auto select_stmt = sql_instance.stage("SELECT * FROM Person;");
+  sql_instance.run_query(select_stmt);
+
   sql_instance.close();
 
   return 0;
