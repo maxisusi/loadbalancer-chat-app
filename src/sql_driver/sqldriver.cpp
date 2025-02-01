@@ -36,7 +36,14 @@ sqlite3_stmt *SqlDriver::stage(const char *statement) {
 
 int SqlDriver::run_query(sqlite3_stmt *statement) {
   Logger log = *new Logger();
-  while (sqlite3_step(statement) != SQLITE_DONE) {
+
+  while (int step = sqlite3_step(statement) != SQLITE_DONE) {
+
+    if (sqlite3_errcode(db_instance) == SQLITE_ERROR) {
+      log.log(LogLevel::INFO, sqlite3_errmsg(db_instance));
+      return SQLD_RUN_ERROR;
+    }
+
     int nums_col = sqlite3_column_count(statement);
 
     for (int i = 0; i < nums_col; ++i) {
@@ -59,15 +66,16 @@ int SqlDriver::run_query(sqlite3_stmt *statement) {
         break;
       }
       default: {
-        // TODO: Better error management
-        return -1;
-        log.log(LogLevel::WARNING, "Couldn't find correspondig time table");
+        log.log(LogLevel::WARNING, "Unhandled table type");
+        return SQLD_ERROR;
       }
       }
     }
   }
+
   sqlite3_finalize(statement);
-  return 1;
+
+  return 0;
 }
 void SqlDriver::close() {
   sqlite3_close(db_instance); // TODO: Handle error

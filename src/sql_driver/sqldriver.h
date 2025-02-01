@@ -11,7 +11,9 @@ using namespace std;
  *
  * Future Error code may be added
  **/
-#define SQLDRIVER_ERROR 0 /* Generic Error */
+#define SQLD_ERROR 1     /* Generic Error */
+#define SQLD_SET_ERROR 2 /* Error generated while stepping */
+#define SQLD_RUN_ERROR 3 /* Runtime Error when calling `run` */
 
 class SqlDriver {
 
