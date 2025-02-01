@@ -39,7 +39,7 @@ int main() {
 
   log.log(LogLevel::INFO, "Insert into table");
   auto insert_stmt =
-      sql_instance.stage("INSERT INTO Person (name) VALUES ('hello world')");
+      sql_instance.stage("INSERT INTO Person (name) VALUES ('My name is max')");
 
   if (sql_instance.run_query(insert_stmt) == SQLD_RUN_ERROR) {
     handle_error("run_query");

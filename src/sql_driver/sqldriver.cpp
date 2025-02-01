@@ -8,25 +8,21 @@ SqlDriver::SqlDriver(std::string db_n) { db_name = db_n; };
 
 int SqlDriver::init() {
 
+  // TODO: Better filename handling
   char buffer[50];
   strcpy(buffer, db_name.c_str());
   sqlite3_open(buffer, &db_instance);
 
   if (db_instance == NULL) {
-    {
-      // log.log(LogLevel::CRITICAL,
-      //         "Process couln't open sqlite file descriptor");
-      return -1;
-      // TODO: Refacto error message with either enum or macros
-    }
+    return SQLD_ERROR;
   }
   return 0;
 }
 sqlite3_stmt *SqlDriver::stage(const char *statement) {
 
   sqlite3_stmt *stmt;
+  sqlite3_prepare_v2(db_instance, statement, -1, &stmt, nullptr);
 
-  int prep = sqlite3_prepare_v2(db_instance, statement, -1, &stmt, nullptr);
   if (stmt == NULL) {
     return nullptr;
   }
@@ -73,7 +69,7 @@ int SqlDriver::run_query(sqlite3_stmt *statement) {
     }
   }
 
-  sqlite3_finalize(statement);
+  sqlite3_finalize(statement); // TODO: Handle error
 
   return 0;
 }
