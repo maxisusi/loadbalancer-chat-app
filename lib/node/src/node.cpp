@@ -1,5 +1,5 @@
 #include "node.h"
-#include "../logger/logger.h"
+#include "logger.hpp"
 #include <cstring>
 #include <netinet/in.h>
 #include <unistd.h>

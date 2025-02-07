@@ -1,17 +1,18 @@
-#include "logger/logger.h"
-#include "sql_driver/sqldriver.h"
-#include <cstdio>
-#include <cstring>
-#include <ctime>
-#include <netinet/in.h>
-#include <sched.h>
-#include <sqlite3.h>
-#include <stdlib.h>
-#include <string>
-#include <sys/socket.h>
-#include <sys/un.h>
-#include <sys/wait.h>
-#include <unistd.h>
+// #include <logger.h>
+// #include <sqldriver.h>
+// #include "sql_driver/sqldriver.h"
+// #include <cstdio>
+// #include <cstring>
+// #include <ctime>
+// #include <netinet/in.h>
+// #include <sched.h>
+// #include <sqlite3.h>
+// #include <stdlib.h>
+// #include <string>
+// #include <sys/socket.h>
+// #include <sys/un.h>
+// #include <sys/wait.h>
+// #include <unistd.h>
 
 #define handle_error(msg)                                                      \
   do {                                                                         \
@@ -23,36 +24,37 @@
 
 int main() {
 
-  Logger log = *new Logger();
-
-  log.log(LogLevel::INFO, "Opening up sqlite connection");
-  SqlDriver sql_instance = *new SqlDriver(DB_NAME);
-
-  sql_instance.init();
-
-  log.log(LogLevel::INFO, "Create Table if it doesn't exist");
-  auto create_stmt = sql_instance.stage(
-      "CREATE TABLE IF NOT EXISTS Person (name varchar(255))");
-  if (sql_instance.run_query(create_stmt) == SQLD_RUN_ERROR) {
-    handle_error("run_query");
-  }
-
-  log.log(LogLevel::INFO, "Insert into table");
-  auto insert_stmt =
-      sql_instance.stage("INSERT INTO Person (name) VALUES ('My name is max')");
-
-  if (sql_instance.run_query(insert_stmt) == SQLD_RUN_ERROR) {
-    handle_error("run_query");
-  }
-
-  log.log(LogLevel::INFO, "Display the table");
-  auto select_stmt = sql_instance.stage("SELECT * FROM Person");
-
-  if (sql_instance.run_query(select_stmt) == SQLD_RUN_ERROR) {
-    handle_error("run_query");
-  }
-
-  sql_instance.close();
+  // Logger log = *new Logger();
+  //
+  // log.log(LogLevel::INFO, "Opening up sqlite connection");
+  // SqlDriver sql_instance = *new SqlDriver(DB_NAME);
+  //
+  // sql_instance.init();
+  //
+  // log.log(LogLevel::INFO, "Create Table if it doesn't exist");
+  // auto create_stmt = sql_instance.stage(
+  //     "CREATE TABLE IF NOT EXISTS Person (name varchar(255))");
+  // if (sql_instance.run_query(create_stmt) == SQLD_RUN_ERROR) {
+  //   handle_error("run_query");
+  // }
+  //
+  // log.log(LogLevel::INFO, "Insert into table");
+  // auto insert_stmt =
+  //     sql_instance.stage("INSERT INTO Person (name) VALUES ('My name is
+  //     max')");
+  //
+  // if (sql_instance.run_query(insert_stmt) == SQLD_RUN_ERROR) {
+  //   handle_error("run_query");
+  // }
+  //
+  // log.log(LogLevel::INFO, "Display the table");
+  // auto select_stmt = sql_instance.stage("SELECT * FROM Person");
+  //
+  // if (sql_instance.run_query(select_stmt) == SQLD_RUN_ERROR) {
+  //   handle_error("run_query");
+  // }
+  //
+  // sql_instance.close();
 
   return 0;
 }

@@ -18,10 +18,17 @@
             boost
             catch2
             cmake
+            cmakerc
+            cmakeCurses
+            cmake-lint
             glib
             sqlite
             pkg-config
           ];
+
+          # shellHook = ''
+          #   export CXXFLAGS="-I${toString ./lib/logger/include}"
+          # '';
         };
       };
     };
