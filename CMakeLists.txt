@@ -10,7 +10,6 @@ add_subdirectory(lib)
 
 enable_testing()
 add_subdirectory(test)
-
-target_link_libraries(chatqui PRIVATE logger node sql_driver sqlite3)
+target_link_libraries(chatqui PRIVATE logger node sql_driver sqlite3 protocat)
 
 target_include_directories(chatqui PUBLIC "${PROJECT_BINARY_DIR}")

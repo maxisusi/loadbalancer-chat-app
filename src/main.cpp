@@ -1,4 +1,5 @@
 #include "logger.hpp"
+#include "protocat.hpp"
 #include <cstdio>
 #include <cstring>
 #include <ctime>
