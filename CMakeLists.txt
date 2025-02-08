@@ -5,7 +5,11 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 add_executable(chatqui src/main.cpp)
+
 add_subdirectory(lib)
+
+enable_testing()
+add_subdirectory(test)
 
 target_link_libraries(chatqui PRIVATE logger node sql_driver sqlite3)
 

@@ -13,32 +13,19 @@
         # devShells.default describes the default shell with C++, cmake, boost,
         # and catch2
         devShells.default = pkgs.mkShell {
-          nativeBuildInputs = with pkgs; [
+          packages = with pkgs; [
             # C++ Compiler is already part of stdenv
-            # boost
-            # catch2
+            boost
+            gtest
+            glib
+            sqlite
+            pkg-config
             cmake
             cmakerc
             cmakeCurses
             cmake-lint
-            # cmakeCurses
-            # cmake-lint
-            # glib
-            # sqlite
-            # pkg-config
-          ];
-          packages = with pkgs; [
-            # C++ Compiler is already part of stdenv
-            boost
-            catch2
-            glib
-            sqlite
-            pkg-config
           ];
 
-          # shellHook = ''
-          #   export CXXFLAGS="-I${toString ./lib/logger/include}"
-          # '';
         };
       };
     };

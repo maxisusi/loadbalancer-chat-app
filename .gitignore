@@ -2,3 +2,4 @@ build
 db_test.db
 .cache/clangd/index
 out/Debug
+Testing/
