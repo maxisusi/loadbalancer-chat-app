@@ -27,31 +27,31 @@ int main() {
   Logger log = *new Logger();
 
   log.log(LogLevel::INFO, "Opening up sqlite connection");
-  SqlDriver sql_instance = *new SqlDriver(DB_NAME);
+  SqlDriver sql_instance("db_test.db");
 
   sql_instance.init();
 
   log.log(LogLevel::INFO, "Create Table if it doesn't exist");
-  auto create_stmt = sql_instance.stage(
+  sqlite3_stmt *create_stmt = sql_instance.stage(
       "CREATE TABLE IF NOT EXISTS Person (name varchar(255))");
-  if (sql_instance.run_query(create_stmt) == SQLD_RUN_ERROR) {
-    handle_error("run_query");
-  }
+  // if (sql_instance.run_query(create_stmt) == SQLD_RUN_ERROR) {
+  //   handle_error("run_query");
+  // }
 
   log.log(LogLevel::INFO, "Insert into table");
   auto insert_stmt =
       sql_instance.stage("INSERT INTO Person (name) VALUES ('My name is max')");
 
-  if (sql_instance.run_query(insert_stmt) == SQLD_RUN_ERROR) {
-    handle_error("run_query");
-  }
+  // if (sql_instance.run_query(insert_stmt) == SQLD_RUN_ERROR) {
+  //   handle_error("run_query");
+  // }
 
   log.log(LogLevel::INFO, "Display the table");
   auto select_stmt = sql_instance.stage("SELECT * FROM Person");
 
-  if (sql_instance.run_query(select_stmt) == SQLD_RUN_ERROR) {
-    handle_error("run_query");
-  }
+  // if (sql_instance.run_query(select_stmt) == SQLD_RUN_ERROR) {
+  //   handle_error("run_query");
+  // }
 
   sql_instance.close();
 

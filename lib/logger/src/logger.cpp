@@ -5,8 +5,6 @@
 #include <stdlib.h>
 #include <string>
 
-Logger::Logger() {}
-
 void Logger::log(LogLevel loglvl, std::string message) {
   auto timestamp = time(NULL);
   struct tm date_time = *localtime(&timestamp);
