@@ -47,42 +47,4 @@ public:
   };
 };
 
-class SqlDriverBadStatment : public exception {
-public:
-  virtual const char *what() const noexcept {
-    return "The staging statement provided is incorrect";
-  };
-};
-
-class SqlDriverBadAllocation : public exception {
-private:
-  string message = "SqlDriverBadAllocation: ";
-
-public:
-  SqlDriverBadAllocation();
-  SqlDriverBadAllocation(const char *msg) { message += msg; };
-
-  virtual const char *what() const noexcept {
-    if (message.length() > 1) {
-      return message.c_str();
-    }
-    return "The database couldn't be allocated in memory";
-  };
-};
-
-class SqlDriverStatmentEval : public exception {
-  string message;
-  int error_code;
-
-public:
-  SqlDriverStatmentEval();
-  SqlDriverStatmentEval(const char *msg) { message += msg; };
-
-  virtual const char *what() const noexcept {
-    if (message.length() > 1) {
-      return message.c_str();
-    }
-    return "An unexpected SqlDriver error happened";
-  };
-};
 #endif
