@@ -17,21 +17,13 @@
 
 int main() {
 
-  SqlDriver sql_instance("db_test.db");
-  sql_instance.init();
-  sqlite3_stmt *create_stmt = sql_instance.stage(
-      "CREATE TABLE IF NOT EXISTS Person (name varchar(255))");
-  sql_instance.run_query(create_stmt);
+  SqlDriver sqlc("db_test.db");
 
-  auto insert_stmt =
-      sql_instance.stage("INSERT INTO Person (name) VALUES ('Max')");
+  sqlc.dispatch("CREATE TABLE IF NOT EXISTS Person (name varchar(255))");
+  sqlc.dispatch("INSERT INTO Person (name) VALUES ('Max')");
+  sqlc.dispatch("SELECT * FROM Person");
 
-  sql_instance.run_query(insert_stmt);
-  auto select_stmt = sql_instance.stage("SELECT * FROM Person");
-
-  sql_instance.run_query(select_stmt);
-
-  sql_instance.close();
+  sqlc.close();
 
   return 0;
 }
