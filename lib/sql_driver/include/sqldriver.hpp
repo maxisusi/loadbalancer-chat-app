@@ -10,16 +10,17 @@ using namespace std;
 class SqlDriver {
 
 private:
+  /**  Db name */
   const char *_name = nullptr;
-  sqlite3 *_instance = nullptr;
+  sqlite3 *_db_instance = nullptr;
 
 private:
-  void run_query(sqlite3_stmt *statement);
   void init();
   sqlite3_stmt *stage(const char *statement);
+  void dispatch_query(sqlite3_stmt *statement);
 
 public:
-  void dispatch(const char *query);
+  void run(const char *query);
   void close();
   SqlDriver(const char *db_n) : _name(db_n) { init(); };
 };
